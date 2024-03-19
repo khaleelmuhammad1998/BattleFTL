@@ -1,2 +1,2 @@
-# BattleFTL
-Mobile/Web Game, made with Cocos Creator.
+# Battle FTL
+The ultimate space battle.
