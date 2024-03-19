@@ -1,0 +1,69 @@
+{
+  "group-list": [
+    "OpWeapon",
+    "PlWeapon",
+    "Opponent",
+    "Player",
+    "Default"
+  ],
+  "collision-matrix": [
+    [
+      false,
+      null,
+      null,
+      true
+    ],
+    [
+      false,
+      false,
+      true
+    ],
+    [
+      false,
+      true,
+      false,
+      true
+    ],
+    [
+      true,
+      false,
+      true,
+      false
+    ],
+    [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  ],
+  "excluded-modules": [
+    "3D Physics/Builtin"
+  ],
+  "preview-port": 7456,
+  "design-resolution-width": 540,
+  "design-resolution-height": 960,
+  "fit-width": true,
+  "fit-height": true,
+  "use-project-simulator-setting": false,
+  "simulator-orientation": false,
+  "use-customize-simulator": true,
+  "simulator-resolution": {
+    "width": 960,
+    "height": 640
+  },
+  "clear-simulator-cache": true,
+  "facebook": {
+    "enable": false,
+    "appID": "",
+    "live": {
+      "enable": false
+    },
+    "audience": {
+      "enable": false
+    }
+  },
+  "start-scene": "84885622-0066-4137-bd28-d67a102ab6e7",
+  "last-module-event-record-time": 1647193402233
+}

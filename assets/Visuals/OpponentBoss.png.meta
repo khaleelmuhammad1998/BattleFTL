@@ -1,0 +1,38 @@
+{
+  "ver": "2.3.7",
+  "uuid": "d847fd25-4de0-4001-ab59-8c9ee4cce87a",
+  "importer": "texture",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 50,
+  "height": 65,
+  "platformSettings": {},
+  "subMetas": {
+    "OpponentBoss": {
+      "ver": "1.0.6",
+      "uuid": "4910796d-9c7b-4aeb-8a8a-519957b3cd12",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "d847fd25-4de0-4001-ab59-8c9ee4cce87a",
+      "trimType": "custom",
+      "trimThreshold": 0,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 50,
+      "height": 65,
+      "rawWidth": 50,
+      "rawHeight": 65,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

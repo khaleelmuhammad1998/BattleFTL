@@ -1,0 +1,37 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "ExplosionOnlyAnimation",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 0.5166666666666667,
+  "sample": 60,
+  "speed": 1,
+  "wrapMode": 2,
+  "curveData": {
+    "comps": {
+      "cc.Sprite": {
+        "spriteFrame": [
+          {
+            "frame": 0,
+            "value": {
+              "__uuid__": "7ec5e0e6-b441-493f-b7b4-2ac1d5946b20"
+            }
+          },
+          {
+            "frame": 0.25,
+            "value": {
+              "__uuid__": "37bd7d0d-0118-4852-8b1c-b01ec86e3cbf"
+            }
+          },
+          {
+            "frame": 0.5,
+            "value": {
+              "__uuid__": "7ec5e0e6-b441-493f-b7b4-2ac1d5946b20"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "events": []
+}

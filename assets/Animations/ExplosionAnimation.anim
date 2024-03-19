@@ -1,0 +1,42 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "ExplosionAnimation",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 0.3333333333333333,
+  "sample": 60,
+  "speed": 1,
+  "wrapMode": 1,
+  "curveData": {
+    "comps": {
+      "cc.Sprite": {
+        "spriteFrame": [
+          {
+            "frame": 0,
+            "value": {
+              "__uuid__": "7ec5e0e6-b441-493f-b7b4-2ac1d5946b20"
+            }
+          },
+          {
+            "frame": 0.25,
+            "value": {
+              "__uuid__": "37bd7d0d-0118-4852-8b1c-b01ec86e3cbf"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "events": [
+    {
+      "frame": 0.3333333333333333,
+      "func": "destroyOpponent",
+      "params": []
+    },
+    {
+      "frame": 0.3333333333333333,
+      "func": "",
+      "params": []
+    }
+  ]
+}
