@@ -1,0 +1,14 @@
+{
+  "splash-setting": {
+    "url": "project://assets/program/icon/icon-128.png",
+    "displayWatermark": true,
+    "displayRatio": 1,
+    "clearColor": {
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 1
+    },
+    "totalTime": 5000
+  }
+}
