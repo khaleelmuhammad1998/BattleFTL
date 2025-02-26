@@ -1,4 +1,4 @@
-import { _decorator, Component, EventKeyboard, EventMouse, EventTarget, EventTouch, Input, input, KeyCode, Node } from 'cc';
+import { _decorator, Component, EventKeyboard, EventMouse, EventTarget, EventTouch, Input, input, KeyCode } from 'cc';
 const { ccclass, property } = _decorator;
 
 /** Constant for listening to or emitting input data from input devices. Input data should only be emitted from InputManager class. */

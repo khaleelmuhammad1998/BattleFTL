@@ -40,7 +40,7 @@ export class OpponentController extends Component {
 
     /** Property Decorator for animation clips. EXPLOSION animation clip should be value 0. */
     @property(AnimationClip)
-    private opponentAnimationClip: AnimationClip [] = [];
+    private opponentAnimationClip: AnimationClip[] = [];
 
     /** Variable for opponent's animation state. */
     private opponentAnimationState: AnimationState = null;
@@ -58,7 +58,7 @@ export class OpponentController extends Component {
         }
 
         // Code to add new animation.
-        if (value != null)  {
+        if (value != null) {
             this.opponentAnimationState = new AnimationState(this.opponentAnimationClip[value], "OpponentAnimationState");
             this.opponentAnimationState.initialize(this.opponentSpriteNode);
             if (state == OPPONENT_ANIMATION_STATE.PLAY) {
@@ -90,7 +90,7 @@ export class OpponentController extends Component {
         this.opponentSpriteComponent.color = new math.Color(255, 0, 0, 255);
         this.scheduleOnce(this.resetOpponentDamageAnimation, 0.1);
     }
-    
+
     // Code for opponent's ammunition.
 
     /** Property Decorator for GameOpponentAmmunition. */
@@ -137,6 +137,7 @@ export class OpponentController extends Component {
     /** Function for opponent's ammunition scheduler. */
     private scheduleOpponentAmmunition(): void {
         if (this.opponentIsActive == true && GameManager.instance.gameStateCurrent == GAME_STATE.PLAYING) {
+            // TODO: Change this complete ammunition system. Refer to Player COntroller.
             let opponentAmmunition = instantiate(this.opponentAmmunitionPrefab);
             opponentAmmunition.setPosition(this.node.getPosition().x, 0, this.opponentAmmunitionInstancesNode.getPosition().z);
             this.opponentAmmunitionInstancesNode.addChild(opponentAmmunition);
@@ -220,28 +221,31 @@ export class OpponentController extends Component {
     // Code for setting up opponent.
 
     /** Function to activate the opponent. */
-    public activateOpponent(value: OPPONENT_ANIMATION_CLIP, gameDifficulty: GAME_DIFFICULTY): void {
+    public activateOpponent(value: OPPONENT_ANIMATION_CLIP, gameDifficulty: GAME_DIFFICULTY): boolean {
         this.node.active = true;
-        
+
         // Code to set opponent's ammunition instantiation.
         this.setOpponentAmmunition(gameDifficulty);
         this.instantiateOpponentAmmunition(true);
 
         // Code to set opponent's collision.
-        this.opponentColliderComponent = this.opponentColliderNode.getComponent(BoxCollider2D);
+        if (this.opponentColliderComponent == null) {
+            this.opponentColliderComponent = this.opponentColliderNode.getComponent(BoxCollider2D);
+        }
         this.opponentColliderComponent.tag = GAME_COLLIDER_TAG.OPPONENT;
         this.opponentColliderComponent.on(Contact2DType.BEGIN_CONTACT, this.detectOpponentCollision.bind(this), this);
-        
+
         // Code to set opponent's animation.
         this.opponentSpriteComponent = this.opponentSpriteNode.getComponent(Sprite);
         this.opponentCurrentAnimationClip = value;
         this.setOpponentAnimation(this.opponentCurrentAnimationClip, OPPONENT_ANIMATION_STATE.PLAY);
-        
+
         this.opponentIsActive = true;
+        return true;
     }
 
     /** Function to deactivate the opponent. */
-    public deactivateOpponent(): void {
+    public deactivateOpponent(): boolean {
         this.opponentIsActive = false;
 
         // Code to set opponent's ammunition instantiation.
@@ -251,26 +255,25 @@ export class OpponentController extends Component {
         // Code to reset opponent's position.
         this.node.setPosition(new Vec3(this.node.getPosition().x, 0, this.node.getPosition().z));
         this.opponentColliderNode.setPosition(new Vec3(0, this.opponentColliderNode.getPosition().y, this.opponentColliderNode.getPosition().z));
-        
+
         // Code to reset opponent's animation.
         this.opponentCurrentAnimationClip = null;
         this.setOpponentAnimation(this.opponentCurrentAnimationClip, OPPONENT_ANIMATION_STATE.STOP);
         this.opponentSpriteComponent = null;
-        
+
         // Code to reset opponent's collision.
         this.opponentColliderComponent.tag = GAME_COLLIDER_TAG.NONE;
-        this.opponentColliderComponent.off(Contact2DType.BEGIN_CONTACT, this.detectOpponentCollision.bind(this), this);    
-        this.opponentColliderComponent = null;
+        this.opponentColliderComponent.off(Contact2DType.BEGIN_CONTACT, this.detectOpponentCollision.bind(this), this);
 
         this.node.active = false;
+        return false;
     }
-
+    
     /** Function to remove the opponent from scene. */
     public removeOpponent(): void {
         this.setOpponentAnimation(null, OPPONENT_ANIMATION_STATE.STOP)
         this.scheduleOnce(() => {
-            // TODO:
-            this.node.destroy();
+            GameManager.instance.manageOpponents(this.deactivateOpponent(), this.node);
         }, 0.1);
     }
 
@@ -284,7 +287,7 @@ export class OpponentController extends Component {
     // Life-cycle Methods of Cocos.
 
     protected onLoad(): void {
-        // this.activateOpponent(OPPONENT_ANIMATION_CLIP.OPPONENT_1, GAME_DIFFICULTY.EASY); // TODO: Move to Game Manager.
+        // this.activateOpponent(OPPONENT_ANIMATION_CLIP.OPPONENT_1, GAME_DIFFICULTY.EASY); // TODO: Refer for Game Manager. Remove later.
     }
 
     protected update(deltaTime: number): void {

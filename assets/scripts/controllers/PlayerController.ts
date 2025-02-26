@@ -1,6 +1,6 @@
 import { _decorator, AnimationClip, AnimationState, BoxCollider2D, Component, Contact2DType, instantiate, IPhysics2DContact, math, Node, NodePool, Prefab, Sprite, Vec3 } from 'cc';
 import { INPUT_COMMAND, INPUT_DEVICE, InputManager, InputManagerEvent, InputManagerEventKeyboard, InputManagerEventMouseTouch } from '../managers/InputManager';
-import { programDebug, PROGRAM_CANVAS_RESOLUTION } from '../Program';
+import { programDebug, PROGRAM_CANVAS_RESOLUTION, programDebugLog } from '../Program';
 import { GAME_COLLIDER_TAG, GAME_DIFFICULTY, GAME_STATE, GameManager } from '../managers/GameManager';
 import { AMMUNITION_TYPE, AmmunitionController } from './AmmunitionController';
 const { ccclass, property } = _decorator;
@@ -27,15 +27,20 @@ enum PLAYER_DIRECTION {
 
 /** Enum for configurations of Player, based on game difficulty. */
 enum PLAYER_CONFIGURATION {
-    AMMUNITION_INSTANTIATE_RATE_TUTORIAL = 0.2,
-    AMMUNITION_INSTANTIATE_RATE_EASY = 0.2,
-    AMMUNITION_INSTANTIATE_RATE_MEDIUM = 0.25,
-    AMMUNITION_INSTANTIATE_RATE_HARD = 0.3,
+    AMMUNITION_INSTANTIATE_RATE_TUTORIAL = 0.1,
+    AMMUNITION_INSTANTIATE_RATE_EASY = 0.1,
+    AMMUNITION_INSTANTIATE_RATE_MEDIUM = 0.2,
+    AMMUNITION_INSTANTIATE_RATE_HARD = 0.25,
 };
 
 /** Class for controlling the Player. */
 @ccclass('PlayerController')
 export class PlayerController extends Component {
+    // Instance of this class.
+
+    /** Instance of this class. */
+    public static instance = null;
+
     // Code for player's graphics.
 
     /** Property Decorator for GamePlayerSprite child node. */
@@ -44,10 +49,10 @@ export class PlayerController extends Component {
 
     /** Variable for player's sprite component. */
     private playerSpriteComponent: Sprite = null;
-    
+
     /** Property Decorator for animation clips. EXPLOSION animation clip should be value 0. */
     @property(AnimationClip)
-    private playerAnimationClip: AnimationClip [] = [];
+    private playerAnimationClip: AnimationClip[] = [];
 
     /** Variable for player's animation state. */
     private playerAnimationState: AnimationState = null;
@@ -65,7 +70,7 @@ export class PlayerController extends Component {
         }
 
         // Code to add new animation.
-        if (value != null)  {
+        if (value != null) {
             this.playerAnimationState = new AnimationState(this.playerAnimationClip[value], "PlayerAnimationState");
             this.playerAnimationState.initialize(this.playerSpriteNode);
             if (state == PLAYER_ANIMATION_STATE.PLAY) {
@@ -108,14 +113,18 @@ export class PlayerController extends Component {
     @property(Node)
     private playerAmmunitionInstancesNode: Node = null;
 
+    /** Variable for player's ammunition node pool. */
+    private playerAmmunitionNodePool: NodePool = new NodePool();
+
     /** Variable to set the time interval at which player's ammunition should spawn. */
     private playerAmmunitionInstantiateRate: number = 0.5;
 
     /** Variable to set player's ammunition type. */
     private playerAmmunitionType: AMMUNITION_TYPE = AMMUNITION_TYPE.PLAYER_1;
 
-    /** Debugging Code - Variable for the current number count of spawned player's ammunition. */
-    private playerAmmunitionNumber: number = 0;
+    /** Variable for the maximum number of  player's ammunition. */
+    private playerAmmunitionNumberMaximum: number = 20;
+    // private playerAmmunitionNumber: number = 0; // TODO: Remove later.
 
     /** Function to set player's ammunition instantiation rate. */
     private setPlayerAmmunition(gameDifficulty: GAME_DIFFICULTY): void {
@@ -142,22 +151,49 @@ export class PlayerController extends Component {
             }
         }
         this.playerAmmunitionType = AMMUNITION_TYPE.PLAYER_1;
-    }
 
+        let playerAmmunitionNode = null;
+        for (let index = 0; index < this.playerAmmunitionNumberMaximum; index++) {
+            playerAmmunitionNode = instantiate(this.playerAmmunitionPrefab);
+            this.playerAmmunitionNodePool.put(playerAmmunitionNode);
+        }
+    }
+    
     /** Function for player's ammunition scheduler. */
     private schedulePlayerAmmunition(): void {
+        let playerAmmunitionNode = null;
         if (this.playerIsControllable == true && GameManager.instance.gameStateCurrent == GAME_STATE.PLAYING) {
-            let playerAmmunition = instantiate(this.playerAmmunitionPrefab);
-            playerAmmunition.setPosition(this.node.getPosition().x, 0, this.playerAmmunitionInstancesNode.getPosition().z);
-            this.playerAmmunitionInstancesNode.addChild(playerAmmunition);
-            playerAmmunition.getComponent(AmmunitionController).activateAmmunition(this.playerAmmunitionType);
-
-            // Debugging Code - Enable code to check and set the player's ammunition current number count.
-            if (programDebug == true) {
-                playerAmmunition.name = `${playerAmmunition.name}-${this.playerAmmunitionNumber}`;
-                this.playerAmmunitionNumber++;
+            if (this.playerAmmunitionNodePool.size() > 0) {
+                playerAmmunitionNode = this.playerAmmunitionNodePool.get();
+                this.playerAmmunitionInstancesNode.addChild(playerAmmunitionNode);
+                playerAmmunitionNode.setPosition(this.node.getPosition().x, 0, this.playerAmmunitionInstancesNode.getPosition().z);
+                playerAmmunitionNode.getComponent(AmmunitionController).activateAmmunition(this.playerAmmunitionType);
+            }
+            else {
+                playerAmmunitionNode = instantiate(this.playerAmmunitionPrefab);
+                this.playerAmmunitionNodePool.put(playerAmmunitionNode);
             }
         }
+
+
+        // TODO: Remove later.
+        // if (this.playerIsControllable == true && GameManager.instance.gameStateCurrent == GAME_STATE.PLAYING) {
+        //     let playerAmmunition = instantiate(this.playerAmmunitionPrefab);
+        //     playerAmmunition.setPosition(this.node.getPosition().x, 0, this.playerAmmunitionInstancesNode.getPosition().z);
+        //     this.playerAmmunitionInstancesNode.addChild(playerAmmunition);
+        //     playerAmmunition.getComponent(AmmunitionController).activateAmmunition(this.playerAmmunitionType);
+
+        //     // Debugging Code - Enable code to check and set the player's ammunition current number count.
+        //     if (programDebug == true) {
+        //         playerAmmunition.name = `${playerAmmunition.name}-${this.playerAmmunitionNumber}`;
+        //         this.playerAmmunitionNumber++;
+        //     }
+        // }
+    }
+
+    /** Function to return player's ammunition back into its node pool. */
+    public returnPlayerAmmunition(value: Node): void {
+        this.playerAmmunitionNodePool.put(value);
     }
 
     /** Function to spawn player's ammunition. This function has scheduler that repeats. */
@@ -180,7 +216,7 @@ export class PlayerController extends Component {
 
     /** Variable for player's direction. This value will be accessed by update(). */
     private playerDirection: string = null;
-    
+
     /** Variable to multiply the player's position value, if the input device is touch. For user experience purposes. */
     private playerPositionMultiplier: number = (InputManager.InputDevice == INPUT_DEVICE.TOUCH ? 3 : 1);
 
@@ -191,7 +227,7 @@ export class PlayerController extends Component {
             this.playerDirection = value;
         }
     }
-    
+
     /** Function to position the player directly, based on mouse or touch input triggered by Input Manager. */
     private positionPlayer(value: number): void {
         if (this.playerIsControllable == true && (GameManager.instance.gameStateCurrent == GAME_STATE.START || GameManager.instance.gameStateCurrent == GAME_STATE.PLAYING)) {
@@ -221,7 +257,7 @@ export class PlayerController extends Component {
     }
 
     // Code for managing data from Input Manager.
-    
+
     /** Function to interpret keyboard input data from Input Manager. */
     private interpretKeyboardInput(value: INPUT_COMMAND): void {
         switch (value) {
@@ -272,7 +308,7 @@ export class PlayerController extends Component {
     public activatePlayer(playerAnimationClip: PLAYER_ANIMATION_CLIP, gameDifficulty: GAME_DIFFICULTY): void {
         this.node.active = true;
         this.node.setPosition(new Vec3(0, this.node.getPosition().y, this.node.getPosition().z));
-        
+
         // Code to enable listening to input data from Input Manager.
         this.stopPlayerMovement();
         if (InputManager.InputDevice == INPUT_DEVICE.KEYBOARD) {
@@ -305,7 +341,7 @@ export class PlayerController extends Component {
     /** Function to deactivate the player. Usually called at the end of the game. */
     public deactivatePlayer(): void {
         this.playerIsControllable = false;
-        
+
         // Code to disable listening to input data from Input Manager.
         this.stopPlayerMovement();
         if (InputManager.InputDevice == INPUT_DEVICE.KEYBOARD) {
@@ -351,6 +387,11 @@ export class PlayerController extends Component {
     }
 
     // Life-cycle Methods of Cocos.
+
+    protected onLoad(): void {
+        // Instance of this class.
+        PlayerController.instance = this;
+    }
 
     protected update(deltaTime: number): void {
         // Code to continuously move the player.

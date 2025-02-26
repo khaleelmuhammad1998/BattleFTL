@@ -15,8 +15,8 @@ export const enum AMMUNITION_TYPE {
 /** Class for controlling the Ammunition. */
 @ccclass('AmmunitionController')
 export class AmmunitionController extends Component {
-    // Code for properties of ammunition.    
-    
+    // Code for properties of ammunition.
+
     /** Variable to check if the ammunition is active. */
     private ammunitionIsActive: boolean = true;
 
@@ -157,12 +157,19 @@ export class AmmunitionController extends Component {
     /** Function to deactivate ammunition. */
     public deactivateAmmunition(): void {
         this.ammunitionIsActive = false;
+        let ammunitionType = this.ammunitionType;
         this.ammunitionType = AMMUNITION_TYPE.NONE;
         this.setAmmunitionPosition(this.ammunitionType);
         this.setAmmunitionSprite(this.ammunitionType);
         this.setAmmunitionCollision(this.ammunitionType);
         this.scheduleOnce(() => {
-            this.node.destroy();
+            if (ammunitionType == AMMUNITION_TYPE.PLAYER_1 || ammunitionType == AMMUNITION_TYPE.PLAYER_2) {
+                PlayerController.instance.returnPlayerAmmunition(this.node);
+            } else if (ammunitionType == AMMUNITION_TYPE.OPPONENT) {
+                this.node.destroy(); // TODO: Change later. Change opponent's ammunition type.
+            } else {
+                this.node.destroy();
+            }
         }, 0.1);
     }
 
